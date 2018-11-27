@@ -4,6 +4,10 @@
 package com.vehicletracking.service;
 
 import java.io.IOException;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -37,7 +41,7 @@ public class vehicleTrackingService {
 	@GET
 	@Path("/getLocation/{vehicleID}")
 	@Produces(MediaType.APPLICATION_XML)
-	public VehicleTrackingPOJO getLocation(@PathParam("vehicleID") String vehicleID) {
+	public VehicleTrackingPOJO getLocation(@PathParam("vehicleID") String vehicleID) throws SQLException, ClassNotFoundException {
 		return new LocationProcessor().getLocation(vehicleID);
 	}
 
@@ -48,8 +52,9 @@ public class vehicleTrackingService {
 	public void logLocation(@PathParam("vehicleID") String vehicleID, @FormParam("timestamp") String timestamp,
 			@FormParam("latitude") String latitude, @FormParam("longitude") String longitude,
 			@Context HttpServletResponse servletResponse) throws IOException {
-		LocationPOJO location = new LocationPOJO(timestamp, latitude, longitude);
-		VehicleTrackingPOJO vTrack = new VehicleTrackingPOJO(vehicleID, location);
+		List<LocationPOJO> locations =new ArrayList<>();
+		locations.add(new LocationPOJO(timestamp, latitude, longitude));
+		VehicleTrackingPOJO vTrack = new VehicleTrackingPOJO(vehicleID,new java.sql.Date(System.currentTimeMillis()) ,locations);
 		new LocationProcessor().logLocation(vTrack);
 	}
 
